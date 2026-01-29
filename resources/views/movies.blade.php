@@ -40,6 +40,29 @@
             @endif
         </div>
     </div>
+    </div> @if($totalPages > 1)
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            
+            <li class="page-item {{ $page <= 1 ? 'disabled' : '' }}">
+                <a class="page-link bg-secondary text-white border-0" 
+                   href="{{ url('/?search='.$search.'&page='.($page-1)) }}">ก่อนหน้า</a>
+            </li>
+
+            <li class="page-item disabled">
+                <span class="page-link bg-dark text-warning border-0">
+                    หน้า {{ $page }} จาก {{ $totalPages }}
+                </span>
+            </li>
+
+            <li class="page-item {{ $page >= $totalPages ? 'disabled' : '' }}">
+                <a class="page-link bg-secondary text-white border-0" 
+                   href="{{ url('/?search='.$search.'&page='.($page+1)) }}">ถัดไป</a>
+            </li>
+
+        </ul>
+    </nav>
+@endif
 
 </body>
 </html>

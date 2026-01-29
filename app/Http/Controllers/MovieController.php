@@ -8,27 +8,33 @@ use Illuminate\Support\Facades\Http; // 👈 พระเอกของเร�
 class MovieController extends Controller
 {
     public function index(Request $request)
-    {
-        $movies = []; // เตรียมตัวแปรว่างไว้ก่อน
+{
+    $movies = [];
+    $search = $request->input('search');
+    $page = $request->input('page', 1); // รับค่าหน้า ถ้าไม่มีให้เริ่มที่ 1
+    $totalPages = 0;
 
-        // ถ้ามีการส่งค่า ?search=... มา
-        if ($request->has('search')) {
-            $apiKey = env('OMDB_API_KEY'); // ดึงกุญแจจาก .env
-            $query = $request->search;
-
-            // 🔥 บรรทัดนี้คือเวทมนตร์! ดึงข้อมูลจาก API ง่ายๆ
-            $response = Http::get("http://www.omdbapi.com/?apikey={$apiKey}&s={$query}");
+    if ($search) {
+        $apiKey = env('OMDB_API_KEY');
+        
+        // ส่งพารามิเตอร์ &page= เข้าไปด้วย
+        $response = Http::get("http://www.omdbapi.com/?apikey={$apiKey}&s={$search}&page={$page}");
+        
+        if ($response->successful()) {
+            $data = $response->json();
+            $movies = $data['Search'] ?? [];
             
-            // แปลง JSON เป็น Array พร้อมใช้งาน
-            if ($response->successful()) {
-                $movies = $response->json()['Search'] ?? [];
-            }
+            // OMDb ส่ง totalResults มาเป็นจำนวนหนังทั้งหมด (เช่น 150 เรื่อง)
+            $totalResults = $data['totalResults'] ?? 0;
+            // OMDb ให้หน้าละ 10 เรื่องเสมอ เลยต้องหาร 10 เพื่อหาจำนวนหน้าทั้งหมด
+            $totalPages = ceil($totalResults / 10);
         }
-
-        // ส่งข้อมูล $movies ไปที่หน้าเว็บ (View)
-        return view('movies', compact('movies'));
     }
-    
+
+    // ส่งตัวแปรที่จำเป็นไปที่หน้า View
+    return view('movies', compact('movies', 'search', 'page', 'totalPages'));
+}
+
     public function show($id)
     {
         $apiKey = env('OMDB_API_KEY');
