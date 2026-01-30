@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http; // 👈 พระเอกของเรา! ต้อง Import ตัวนี้
+use Illuminate\Support\Facades\Http;
 
 class MovieController extends Controller
 {
